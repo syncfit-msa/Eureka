@@ -2,28 +2,13 @@ pipeline {
     agent any
 
     stages {
-        stage('Check Branch') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                echo 'Running on develop branch ~~~'
-            }
-        }
-
         stage('Git clone') {
-            when {
-                branch 'develop'
-            }
             steps {
                 git branch: 'develop', url: 'https://github.com/syncfit-msa/Eureka.git';
             }
         }
 
         stage('Project Build') {
-            when {
-                branch 'develop'
-            }
             steps {
                 sh '''
                     echo build start;
@@ -33,9 +18,6 @@ pipeline {
         }
 
         stage ('AWS Credential') {
-            when {
-                branch 'develop'
-            }
             steps {
                 withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
@@ -46,9 +28,6 @@ pipeline {
         }
 
         stage('Docker Image Build') {
-            when {
-                branch 'develop'
-            }
             steps {
                 sh '''
                     docker build --platform linux/amd64 -t lg-cns-mini-2-10/eureka .
@@ -58,9 +37,6 @@ pipeline {
         }
 
         stage("Push to ECR") {
-            when {
-                branch 'develop'
-            }
             steps {
                 withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
@@ -71,9 +47,6 @@ pipeline {
         }
 
         stage('Deploy to ECS') {
-            when {
-                branch 'develop'
-            }
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
@@ -85,9 +58,6 @@ pipeline {
         }
 
         stage('Cleanup') {
-            when {
-                branch 'develop'
-            }
             steps {
                 sh 'docker rmi lg-cns-mini-2-10/eureka:latest || true'
                 sh 'docker rmi 969400486267.dkr.ecr.ap-northeast-3.amazonaws.com/lg-cns-mini-2-10/eureka:latest || true'
