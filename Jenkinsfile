@@ -1,11 +1,12 @@
 pipeline {
     agent any
 
+    when {
+        branch 'develop'
+    }
+
     stages {
         stage('Check Branch') {
-            when {
-                branch 'develop'
-            }
             steps {
                 echo 'Running on develop branch'
             }
@@ -46,9 +47,6 @@ pipeline {
         }
 
         stage("Push to ECR") {
-            when {
-                branch 'develop'
-            }
             steps {
                 withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
@@ -59,9 +57,6 @@ pipeline {
         }
 
         stage('Deploy to ECS') {
-            when {
-                branch 'develop'
-            }
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
