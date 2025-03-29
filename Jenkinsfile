@@ -11,7 +11,7 @@ pipeline {
             }
         }
 
-        stage('git clone') {
+        stage('Git clone') {
             when {
                 branch 'develop'
             }
