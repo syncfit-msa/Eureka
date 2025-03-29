@@ -7,7 +7,7 @@ pipeline {
                 branch 'develop'
             }
             steps {
-                echo 'Running on develop branch ~~'
+                echo 'Running on develop branch ~~~'
             }
         }
 
