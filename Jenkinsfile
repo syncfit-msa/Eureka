@@ -52,7 +52,12 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-access-key'
                 ]]) {
-                    sh 'aws ecs update-service --cluster LG-CNS-Mini2-10 --service srv-Eureka --force-new-deployment'
+//                     sh 'aws ecs update-service --cluster LG-CNS-Mini2-10 --service srv-Eureka --force-new-deployment'
+                       sh '''
+                            RUNNING_COUNT=$(aws ecs describe-services --cluster LG-CNS-Mini2-10 --services srv-Eureka --query "services[0].runningCount" --output text)
+                            aws ecs update-service --cluster LG-CNS-Mini2-10 --service srv-Eureka --desired-count $RUNNING_COUNT --force-new-deployment
+                            aws ecs wait services-stable --cluster LG-CNS-Mini2-10 --services srv-Eureka
+                       '''
                 }
             }
         }
