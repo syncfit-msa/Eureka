@@ -7,11 +7,11 @@ pipeline {
                 branch 'develop'
             }
             steps {
-                echo 'Running on develop branch'
+                echo 'Running on develop branch ~~'
             }
         }
 
-        stage('git clone') {
+        stage('Git clone') {
             when {
                 branch 'develop'
             }
