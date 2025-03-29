@@ -30,8 +30,8 @@ pipeline {
         stage('Docker Image Build') {
             steps {
                 sh '''
-                    docker build --platform linux/amd64 -t lg-cns-mini-2-10/eureka .
-                    docker tag lg-cns-mini-2-10/eureka:latest 969400486267.dkr.ecr.ap-northeast-3.amazonaws.com/lg-cns-mini-2-10/eureka:latest
+                    docker build --platform linux/amd64 -t mini2/eureka .
+                    docker tag mini2/eureka:latest 268104899906.dkr.ecr.ap-northeast-3.amazonaws.com/mini2/eureka:latest
                 '''
             }
         }
@@ -41,7 +41,7 @@ pipeline {
                 withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
                 credentialsId: 'aws-access-key']]) {
-                    sh 'docker push 969400486267.dkr.ecr.ap-northeast-3.amazonaws.com/lg-cns-mini-2-10/eureka:latest'
+                    sh 'docker push 268104899906.dkr.ecr.ap-northeast-3.amazonaws.com/mini2/eureka:latest'
                 }
             }
         }
@@ -52,15 +52,15 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-access-key'
                 ]]) {
-                    sh 'aws ecs update-service --cluster LG-CNS-Mini2 --service srv-LG-CNS-Eureka --force-new-deployment'
+                    sh 'aws ecs update-service --cluster LG-CNS-Mini2-10 --service srv-Eureka --force-new-deployment'
                 }
             }
         }
 
         stage('Cleanup') {
             steps {
-                sh 'docker rmi lg-cns-mini-2-10/eureka:latest || true'
-                sh 'docker rmi 969400486267.dkr.ecr.ap-northeast-3.amazonaws.com/lg-cns-mini-2-10/eureka:latest || true'
+                sh 'docker rmi mini2/eureka:latest || true'
+                sh 'docker rmi 268104899906.dkr.ecr.ap-northeast-3.amazonaws.com/mini2/eureka:latest || true'
             }
         }
     }
