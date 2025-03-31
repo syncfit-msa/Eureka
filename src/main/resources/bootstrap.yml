@@ -3,7 +3,7 @@ spring:
     name: service-discovery
   cloud:
     config:
-      uri: http://127.0.0.1:8888
+      uri: http://${SRV_CONFIG_HOST:127.0.0.1}:${SRV_CONFIG_PORT:8888}
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
