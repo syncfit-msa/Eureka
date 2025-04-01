@@ -4,15 +4,15 @@ pipeline {
     stages {
         stage('Git clone') {
             steps {
-                git branch: 'develop', url: 'https://github.com/syncfit-msa/Eureka.git';
+                git branch: 'develop', url: 'https://github.com/syncfit-msa/Eureka';
             }
         }
 
         stage('Project Build') {
             steps {
                 sh '''
-                    echo build start;
-                    ./gradlew clean build -DskipTests=true
+                    echo build start ~;
+                    ./gradlew clean build -x test
                 ''';
             }
         }
@@ -46,18 +46,18 @@ pipeline {
             }
         }
 
-        stage('Deploy to ECS') {
+        stage('Deploy to EC2') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-access-key'
-                ]]) {
-//                     sh 'aws ecs update-service --cluster LG-CNS-Mini2-10 --service srv-Eureka --force-new-deployment'
-                       sh '''
-                            RUNNING_COUNT=$(aws ecs describe-services --cluster LG-CNS-Mini2-10 --services srv-Eureka --query "services[0].runningCount" --output text)
-                            aws ecs update-service --cluster LG-CNS-Mini2-10 --service srv-Eureka --desired-count $RUNNING_COUNT --force-new-deployment
-                            aws ecs wait services-stable --cluster LG-CNS-Mini2-10 --services srv-Eureka
-                       '''
+                sshagent(['ec2-ssh-key']) {
+                    sh '''
+                        ssh ec2-user@172.31.38.250 '
+                            aws ecr get-login-password --region ap-northeast-3 | docker login --username AWS --password-stdin 268104899906.dkr.ecr.ap-northeast-3.amazonaws.com
+                            docker pull 268104899906.dkr.ecr.ap-northeast-3.amazonaws.com/mini2/eureka:latest
+
+                            docker-compose down
+                            docker-compose up -d
+                        '
+                    '''
                 }
             }
         }
